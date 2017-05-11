@@ -11,7 +11,7 @@ var savetodb  = require(__dirname + '/jobs/savetodb');
 var Movie    = require(__dirname + '/models/movies');
 var Location    = require(__dirname + '/models/locations');
 
-mongoose.connect(process.env.MONGODB_URL);
+mongoose.connect(process.env.MONGODB_URI);
 var db = mongoose.connection;
 
 // need to add this to avoid error logs
