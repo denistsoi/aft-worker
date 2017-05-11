@@ -61,6 +61,9 @@ db.once('open', ()=> {
  */
 var app = express();
 
+app.use(express.static(`${__dirname}/dist`));
+app.use(express.static(`${__dirname}/public`));
+
 /**
  * routes
  */
