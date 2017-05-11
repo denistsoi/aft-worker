@@ -1,12 +1,17 @@
 var Movie = require('../models/movies');
 var debug = require('debug')('savetodb');
 
+/**
+ * [savetodb saves movies to mongodb url]
+ * @param  {[array]} data [stringified JSON array]
+ */
 var savetodb = function(data) {
-  var movies = JSON.parse(data);
+  var body = data.body;
+  var movies = JSON.parse(body);
   debug('save to db');
   debug(movies.length);
   
-  var saveAllMovies = movies.forEach((movie)=> {
+  var saveAllMovies = movies.map((movie)=> {
     
     new Promise((resolve, reject) => {
     
@@ -20,11 +25,12 @@ var savetodb = function(data) {
               director: movie.director
             });
 
-            resolve(newMovie.save().then(doc => {
-              console.log(doc);
-            }).catch(err => {
-              debug('err', err);
-            }));
+            newMovie.save((err,result) => {
+              if (err) {
+                reject(err);
+              }
+              resolve(result);
+            });
           }
         }
       });
@@ -32,11 +38,9 @@ var savetodb = function(data) {
     });
   }); 
 
-  Promise.all(saveAllMovies).then(data => {
-    debug(data);
-  }).catch(err => {
-    debug('error', err);
-  });
+  // return new Promise((resolve, reject) => {
+  Promise.all(saveAllMovies);
+  
 
 };  
 

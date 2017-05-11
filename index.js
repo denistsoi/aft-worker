@@ -11,6 +11,9 @@ var savetodb  = require(__dirname + '/jobs/savetodb');
 mongoose.connect(process.env.MONGODB_URL);
 var db = mongoose.connection;
 
+// need to add this to avoid error logs
+mongoose.Promise = Promise;
+
 db
   .on('error', console.log.bind(console, 'connection err:'))
   .once('open', ()=> {
@@ -24,7 +27,8 @@ db
           debug('lets do some work');
 
           fetcher().then(body => {
-            savetodb(body.body);
+            // debug(body);
+            savetodb(body);
           }).catch(err => {
             debug('err', err);
           });

@@ -4,6 +4,7 @@
   "description": "worker service for SF Movies",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
     "test": "node test.js"
   },
   "keywords": [
