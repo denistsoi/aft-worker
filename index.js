@@ -8,15 +8,18 @@ var port     = process.env.PORT || 3000;
 var fetcher   = require(__dirname + '/jobs/fetcher');
 var savetodb  = require(__dirname + '/jobs/savetodb');
 
+var Movie    = require(__dirname + '/models/movies');
+
 mongoose.connect(process.env.MONGODB_URL);
 var db = mongoose.connection;
 
 // need to add this to avoid error logs
 mongoose.Promise = Promise;
 
-db
-  .on('error', console.log.bind(console, 'connection err:'))
-  .once('open', ()=> {
+db.on('error', console.log.bind(console, 'connection err:'));
+
+// check collections and then fetch/save to db
+db.once('open', ()=> {
     debug('connected to db');
 
     mongoose.connection.db.listCollections({ name: 'movies' })
@@ -33,7 +36,7 @@ db
             debug('err', err);
           });
         } else {
-          require('./models/movies').count({}, (err, count)=> {
+          Movie.count({}, (err, count)=> {
             debug('count', count);
           });
         }
@@ -43,14 +46,31 @@ db
     app.listen(port);
 });
 
+/**
+ * init app
+ */
 var app = express();
 
+/**
+ * routes
+ */
+
 app.get('/', (req, res) => {
-  debug('/', req)
-  res.send('hi');
+  res.send('aft-worker api service');
 });
 
-app.get('/api', (req, res)=>{
-  debug('/api', req)
-  res.send('hello world');
+app.get('/api/:title', (req, res)=>{
+  debug('/api', req.params.title, req.query)
+  
+  var title = req.params.title;
+
+  var MovieQuery = { 
+    title: {
+      $regex: new RegExp('^' + title.toLowerCase(), 'i') 
+    }
+  }
+
+  Movie.find(MovieQuery, (err, movie)=>{
+    res.json(movie);
+  });
 });
