@@ -3,9 +3,9 @@ var ObjectId = mongoose.Schema.Types.ObjectId;
 
 var MovieSchema = new mongoose.Schema({
   title: {
+    index: 1,
     type: String,
     require: true,
-    unique: true
   },
   director: {
     type: String

@@ -9,6 +9,7 @@ var fetcher   = require(__dirname + '/jobs/fetcher');
 var savetodb  = require(__dirname + '/jobs/savetodb');
 
 var Movie    = require(__dirname + '/models/movies');
+var Location    = require(__dirname + '/models/locations');
 
 mongoose.connect(process.env.MONGODB_URL);
 var db = mongoose.connection;
@@ -22,6 +23,7 @@ db.on('error', console.log.bind(console, 'connection err:'));
 db.once('open', ()=> {
     debug('connected to db');
 
+    // find if movies have been inserted into the db
     mongoose.connection.db.listCollections({ name: 'movies' })
       .next((err, collection)=> {
         if (err) throw new Error('collection error: ', err);
@@ -29,8 +31,8 @@ db.once('open', ()=> {
         if (!collection) {
           debug('lets do some work');
 
+          // go and fetch and save to db
           fetcher().then(body => {
-            // debug(body);
             savetodb(body);
           }).catch(err => {
             debug('err', err);
@@ -41,7 +43,15 @@ db.once('open', ()=> {
           });
         }
       });
-    
+
+    // find if locations have been inserted into the db
+    mongoose.connection.db.listCollections({ name: 'movielocations' })
+      .next((err, collection)=> {
+        Location.count({}, (err, count)=>{
+          debug('count', count);
+        });
+      });
+
     debug('server is listening to port ', port);
     app.listen(port);
 });
@@ -59,16 +69,24 @@ app.get('/', (req, res) => {
   res.send('aft-worker api service');
 });
 
-app.get('/api/:title', (req, res)=>{
-  debug('/api', req.params.title, req.query)
+app.get('/movies/:title/?location', (req,res)=> {
+  debug('/movies/location', req.params.title, req.query)
+
+  // add query params here to give geojson
+});
+
+app.get('/movies/:title', (req, res)=>{
+  debug('/movies', req.params.title, req.query)
   
   var title = req.params.title;
 
   var MovieQuery = { 
     title: {
-      $regex: new RegExp('^' + title.toLowerCase(), 'i') 
+      $regex: new RegExp(title.toLowerCase(), 'i') 
     }
   }
+
+  // need to only show one per result, i.e. unique
 
   Movie.find(MovieQuery, (err, movie)=>{
     res.json(movie);
