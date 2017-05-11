@@ -11,18 +11,17 @@ var savetodb = function(data) {
   debug('save to db');
   debug(movies.length);
   
-  var saveAllMovies = movies.map((movie)=> {
+  var saveAllMovies = movies.map((data)=> {
     
     new Promise((resolve, reject) => {
     
-      Movie.findOne({ title: movie.title }, (err, m)=> {
+      Movie.findOne({ title: data.title }, (err, movie)=> {
         if (!err) {
-          if(!m) {
-
+          if(!movie) {
             var newMovie = new Movie({
-              title: movie.title,
-              release_year: movie.release_year,
-              director: movie.director
+              title: data.title,
+              release_year: data.release_year,
+              director: data.director
             });
 
             newMovie.save((err,result) => {
@@ -32,16 +31,14 @@ var savetodb = function(data) {
               resolve(result);
             });
           }
+          resolve();
         }
       });
     
     });
   }); 
 
-  // return new Promise((resolve, reject) => {
   Promise.all(saveAllMovies);
-  
-
 };  
 
 exports = module.exports = savetodb;
