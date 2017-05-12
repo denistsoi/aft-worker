@@ -90,5 +90,11 @@ Admittantly, it looks bad/sloppy, but I did want to only show what I was attempt
 
 Time constraints... :(.
 
+#### 5. Why are there so many Promises?
+
+Firstly, I wanted to attempt to use async/await - but certain things, like request, doesn't return Promises (_I know that I could use `request-promise`, but i didn't want to introduce another complexity by adding another library).
+
+I didn't manage to find time within the week to finish this.
+
 ### author
 Denis Tsoi <denistsoi@gmail.com>
